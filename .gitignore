@@ -1,0 +1,13 @@
+.classpath
+.project
+.settings
+.springBeans
+target
+target-eclipse
+build
+.gradle
+.DS_Store
+stacktrace.log
+.*.swp
+.*.swo
+shopping-list-config.groovy
