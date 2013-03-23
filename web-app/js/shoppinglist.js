@@ -1,8 +1,12 @@
 var ShoppingList = ShoppingList || {};
 
+ShoppingList.currentListId = -1;
+
 jQuery(document).ready(function($) {
-	var sid = 1;
 	var listItemTemplate = Handlebars.templates['listItem.tmpl'];
+	var listTemplate = Handlebars.templates['list.tmpl'];
+	var shoppingLists = $("#shoppingLists");
+	var shoppingList = $("#shoppingList");
 
 	$.ajaxSetup({
 		contentType: 'application/json',
@@ -15,9 +19,114 @@ jQuery(document).ready(function($) {
 		}
 	});
 
+	var handleListLinkClick = function (event) {
+		ShoppingList.currentListId = $(this).data('sid');
+
+		$.ajax("shoppingList/" + ShoppingList.currentListId, {
+			success: function (data) {
+				shoppingList.empty();
+				$("#listName").text(data.description);
+
+				data.items.forEach(function (item) {
+					var html = listItemTemplate(item);
+					shoppingList.append(html).trigger('create');
+				});
+
+				$("input[type='checkbox']").on("change", function (event) {
+					var data = {
+						obtained: $(this).is(':checked')
+					};
+
+					$.ajax('shoppingList/' + ShoppingList.currentListId + '/listItem/' + $(this).attr('value'), {
+						type: 'PUT',
+						data: data,
+						success: function (data, status, xhr) {
+							console.log('Updated list item');
+						},
+						error: function (xhr, status, error) {
+							console.log("ERROR: " + error + " (" + status + ")");
+						}
+					});
+				});
+			},
+			error: function (xhr, status, error) {
+				console.log("ERROR: " + error);
+			}
+		});
+	};
+
+	$.ajax("shoppingList", {
+		success: function (data) {
+			shoppingLists.empty();
+			data.forEach(function (item) {
+				shoppingLists.append(listTemplate(item));
+			});
+
+			shoppingLists.listview("refresh");
+		},
+		error: function (xhr, status, error) {
+			console.log("ERROR: " + error);
+		}
+	});
+
+	shoppingLists.on("click", ".gotoList", handleListLinkClick);
+
 	$("#checkOffAllLink").click(function () {
 		console.log("check all");
 		$("input[type='checkbox']").attr("checked", true).trigger("change").checkboxradio("refresh");
+	});
+
+	$("#homeButtonLink").click(function () {
+		ShoppingList.currentListId = -1;
+	});
+
+	$("#saveListButton").click(function () {
+		var newListName = $("#add-list-description");
+
+		var list = {
+			description: newListName.val()
+		};
+
+		newListName.val("");
+
+		$.ajax("shoppingList", {
+			type: "POST",
+			data: list,
+			success: function (data) {
+				var html = listTemplate(data);
+				shoppingLists.append(html);
+				shoppingLists.listview("refresh");
+			},
+			error: function (xhr, status, error) {
+				console.log("ERROR: " + error);
+			}
+		});
+	});
+
+	$("#saveItemsButton").click(function () {
+		var items = $("#add-items");
+
+		var data = {
+			items: items.val()
+		};
+
+		items.val("");
+
+		$.ajax("shoppingList/" + ShoppingList.currentListId + "/listItem/bulkAdd", {
+			type: "POST",
+			data: data,
+			success: function (data) {
+				data.forEach(function (item) {
+					shoppingList.append(listItemTemplate(item)).trigger("create");
+				});
+
+				console.log("Items added");
+			},
+			error: function(xhr, status, error) {
+				console.log("ERROR: " + error);
+			}
+		});
+
 	});
 
 	$("#saveItemButton").click(function () {
@@ -33,49 +142,16 @@ jQuery(document).ready(function($) {
 		addName.val("");
 		addQuantity.val(1).slider("refresh");
 
-		$.ajax("shoppingList/" + sid + "/listItem", {
+		$.ajax("shoppingList/" + ShoppingList.currentListId + "/listItem", {
 			type: "POST",
 			data: item,
 			success: function (data) {
-				var html = listItemTemplate(data);
-				$("#shoppingList").append(html).trigger('create');
-
+				shoppingList.append(listItemTemplate(data)).trigger("create");
 				console.log("Item added");
 			},
 			error: function (xhr, status, error) {
 				console.log("ERROR: " + error);
 			}
 		});
-	});
-
-	$.ajax("shoppingList/" + sid, {
-		success: function (data) {
-			$('#listName').text(data.description);
-
-			data.items.forEach(function (item) {
-				var html = listItemTemplate(item);
-				$("#shoppingList").append(html).trigger('create');
-			});
-
-			$("input[type='checkbox']").on("change", function (event) {
-				var data = {
-					obtained: $(this).is(':checked')
-				};
-
-				$.ajax('shoppingList/' + sid + '/listItem/' + $(this).attr('value'), {
-					type: 'PUT',
-					data: data,
-					success: function (data, status, xhr) {
-						console.log('Updated list item');
-					},
-					error: function (xhr, status, error) {
-						console.log("ERROR: " + error + " (" + status + ")");
-					}
-				});
-			});
-		},
-		error: function (xhr, status, error) {
-			console.log("ERROR: " + error);
-		}
 	});
 });

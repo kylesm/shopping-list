@@ -1,9 +1,6 @@
 package shopping.list
 
 class ListItemController {
-
-	def index() { }
-
 	def update() {
 		def item = ListItem.get(params.id)
 
@@ -16,6 +13,7 @@ class ListItemController {
 		}
 
 		item.obtained = request.JSON?.obtained
+		item.order = request.JSON?.order
 
 		if (!item.save()) {
 			render(contentType: "application/json", status: 500) {
@@ -39,10 +37,8 @@ class ListItemController {
 
 		params.remove('sid')
 
-
-		println request.JSON
-
 		def item = new ListItem(request.JSON)
+		item.order = shoppingList.items.size() + 1
 
 		shoppingList.addToItems(item)
 
@@ -67,7 +63,7 @@ class ListItemController {
 			obtained: item.obtained
 		]
 
-		render(contentType: "application/json") {
+		render(contentType: "application/json", status: 201) {
 			output
 		}
 	}
@@ -90,6 +86,65 @@ class ListItemController {
 			render(contentType: "application/json", status: 404) {
 				[errorMessage: "Not found"]
 			}
+		}
+	}
+
+	def bulkAdd() {
+		def shoppingList = ShoppingList.get(params.sid)
+
+		if (!shoppingList) {
+			render(contentType: "application/json", status: 404) {
+				[errorMessage: "Not found"]
+			}
+		}
+
+		params.remove('sid')
+
+		def nextOrder = shoppingList.items.size() + 1
+		def items = request.JSON?.items
+		def pattern = ~/^(\d+)\s+(.*)\s*$/
+		def newItems = []
+
+		items.eachLine { line ->
+			def matcher = pattern.matcher(line)
+			def quantity = 1
+			def name = line
+
+			if (matcher.matches()) {
+				quantity = matcher[0][1]
+				name = matcher[0][2]
+			}
+
+			def item = new ListItem([order: nextOrder, name: name, quantity: quantity])
+			shoppingList.addToItems(item)
+			newItems << item
+			nextOrder += 1
+		}
+
+		if (!shoppingList.save()) {
+
+			render(contentType: "application/json", status: 500) {
+				[errorMessage: "Unable to save changes"]
+			}
+
+			return
+		} else {
+			shoppingList.errors.each { println it }
+		}
+
+		def output = []
+
+		newItems.each { item ->
+			output << [	
+				id: item.id,
+				name: item.name,
+				quantity: item.quantity,
+				obtained: item.obtained
+			]
+		}
+
+		render(contentType: "application/json", status: 201) {
+			output
 		}
 	}
 }

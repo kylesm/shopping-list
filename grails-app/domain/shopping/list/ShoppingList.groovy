@@ -5,6 +5,7 @@ class ShoppingList {
 	Date dateCreated
 	Date lastUpdated
 	boolean completed
+	SortedSet items
 
 	static hasMany = [items: ListItem]
 
