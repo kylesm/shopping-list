@@ -11,6 +11,8 @@ class ShoppingListController {
 		def shoppingList = new ShoppingList(request.JSON)
 
 		if (!shoppingList.save()) {
+			shoppingList.errors.each { log.error(it) }
+
 			render(contentType: "application/json", status: 500) {
 				[errorMessage: "Unable to save changes"]
 			}
@@ -80,6 +82,8 @@ class ShoppingListController {
 		shoppingList.description = request.JSON?.description
 
 		if (!shoppingList.save()) {
+			shoppingList.errors.each { log.error(it) }
+
 			render(contentType: "application/json", status: 500) {
 				[errorMessage: "Unable to save changes"]
 			}

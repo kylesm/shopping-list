@@ -13,9 +13,10 @@ class ListItemController {
 		}
 
 		item.obtained = request.JSON?.obtained
-		item.order = request.JSON?.order
 
 		if (!item.save()) {
+			item.errors.each { log.error(it) }
+
 			render(contentType: "application/json", status: 500) {
 				[errorMessage: "Unable to save changes"]
 			}
@@ -50,10 +51,8 @@ class ListItemController {
 
 			return
 		} else {
-			shoppingList.errors.each { println it }
-			item.errors.each {
-				println "Item: " + it
-			}
+			shoppingList.errors.each { log.error(it) }
+			item.errors.each { log.error(it) }
 		}
 
 		def output = [
@@ -122,14 +121,13 @@ class ListItemController {
 		}
 
 		if (!shoppingList.save()) {
+			shoppingList.errors.each { log.error(it) }
 
 			render(contentType: "application/json", status: 500) {
 				[errorMessage: "Unable to save changes"]
 			}
 
 			return
-		} else {
-			shoppingList.errors.each { println it }
 		}
 
 		def output = []
