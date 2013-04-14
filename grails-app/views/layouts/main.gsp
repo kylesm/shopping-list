@@ -10,7 +10,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css" type="text/css">
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" type="text/css">
 
 		<g:layoutHead/>
 		<r:layoutResources />
@@ -19,7 +19,7 @@
 		<g:layoutBody/>
 		<script src="http://code.jquery.com/jquery-1.9.1.min.js" type="text/javascript">
 		</script>
-		<script src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js" type="text/javascript">
+		<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js" type="text/javascript">
 		</script>
 		<r:layoutResources />
 	</body>
