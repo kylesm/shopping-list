@@ -1,20 +1,16 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
-
 <html>
 <head>
-  <title>Shopping list</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css" type="text/css">
+	<title>Shopping list</title>
+	<meta name="layout" content="main"/>
+	<r:require modules="core,templates,application"/>
 </head>
 
 <body>
 <div data-role="page" id="home">
-    <div data-role="header">
+    <div data-role="header" data-position="fixed">
 		<a href="#newList" id="newListLink" data-rel="popup" data-role="button" data-inline="true" data-transition="pop" data-icon="plus" data-theme="a">Add List</a>
 		<h1>Shopping Lists</h1>
-		<a href="#logout" data-rel="popup" data-role="button" data-inline="true" data-transition="pop" data-icon="gear" data-theme="a">Logout</a>
+		<a href="logout" data-role="button" data-ajax="false" data-icon="gear" data-theme="a">Logout</a>
     </div>
 	<div data-role="content" data-theme="a" class="ui-corner-bottom ui-content">
 		<ul data-role="listview" id="shoppingLists">
@@ -37,7 +33,7 @@
 </div>
 
 <div data-role="page" id="listDetail">
-	<div data-role="header">
+	<div data-role="header" data-position="fixed">
 		<a href="#home" data-icon="home" id="homeButtonLink">Home</a>
 		<h1 id="listName">Shopping List</h1>
 		<a href="#popupMenu" data-rel="popup" data-role="button" data-inline="true" data-transition="pop" data-icon="bars" data-theme="a">Menu</a>
@@ -49,7 +45,7 @@
           <li><a href="#addItemDialog" id="addItemLink" data-rel="popup" data-position-to="window" data-inline="true" data-transition="pop" data-icon="plus" data-theme="a">Add Item</a></li>
           <li><a href="#bulkAddItemDialog" id="bulkAddItemLink" data-rel="popup" data-position-to="window" data-inline="true" data-transition="pop" data-icon="plus" data-theme="a">Bulk Add Items</a></li>
           <li><a href="#checkOffAll" id="checkOffAllLink">Check Off All</a></li>
-          <li><a href="#logout" id="logoutLink" data-icon="gear" data-theme="a">Logout</a></li>
+          <li><a href="logout" id="logoutLink" data-ajax="false" data-icon="gear" data-theme="a">Logout</a></li>
         </ul>
       </div>
     </div>
@@ -88,19 +84,5 @@
       <div data-role="content" id="shoppingList"></div>
     </form>
   </div>
-<script src="http://code.jquery.com/jquery-1.9.1.min.js" type="text/javascript">
-</script>
-<script src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js" type="text/javascript">
-</script>
-<script src="js/json2.js" type="text/javascript">
-</script>
-<script src="js/handlebars.runtime.js" type="text/javascript">
-</script>
-<script src="js/listItem.tmpl.js" type="text/javascript">
-</script>
-<script src="js/list.tmpl.js" type="text/javascript">
-</script>
-<script src="js/shoppinglist.js" type="text/javascript">
-</script>
 </body>
 </html>
