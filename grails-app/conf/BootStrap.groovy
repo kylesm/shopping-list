@@ -21,7 +21,7 @@ class BootStrap {
 
 			ShoppingList.withTransaction { status ->
 				def list = new ShoppingList([
-					description: 'My shopping list', completed: false, items: []
+					description: 'My shopping list', completed: false, items: [], owner: testUser
 				])
 
 				list.items.addAll([

@@ -17,14 +17,32 @@
 package shopping.list
 
 class ShoppingListController {
+	def springSecurityService
+	def authorizationService
+
+	private def checkListOwnership(id) {
+		def response = authorizationService.checkListOwnership(id)
+
+		if (!response.authorized) {
+			render(contentType: "application/json", status: response.status) {
+				[errorMessage: response.errorMessage]
+			}
+
+			return false
+		}
+
+		return true
+	}
+
 	def list() {
 		render(contentType: "application/json") {
-			ShoppingList.listOrderByLastUpdated(max: 25, order: "desc")
+			ShoppingList.findAllByOwner(springSecurityService.currentUser, [max: 25, sort: "lastUpdated", order: "desc"])
 		}
 	}
 
 	def save() {
 		def shoppingList = new ShoppingList(request.JSON)
+		shoppingList.owner = springSecurityService.currentUser
 
 		if (!shoppingList.save()) {
 			shoppingList.errors.each { log.error(it) }
@@ -49,51 +67,43 @@ class ShoppingListController {
 	}
 
 	def show() {
+		if (!checkListOwnership(params.id)) {
+			return
+		}
+
 		def shoppingList = ShoppingList.get(params.id)
 
-		if (shoppingList) {
-			def output = [
-				description: shoppingList.description,
-				dateCreated: shoppingList.dateCreated,
-				lastUpdated: shoppingList.lastUpdated,
-				completed: shoppingList.completed,
-				items: shoppingList.items
-			]
+		def output = [
+			description: shoppingList.description,
+			dateCreated: shoppingList.dateCreated,
+			lastUpdated: shoppingList.lastUpdated,
+			completed: shoppingList.completed,
+			items: shoppingList.items
+		]
 
-			render(contentType: "application/json") {
-				output
-			}
-		} else {
-			render(contentType: "application/json", status: 404) {
-				[errorMessage: "Not found"]
-			}
+		render(contentType: "application/json") {
+			output
 		}
 	}
 
 	def delete() {
+		if (!checkListOwnership(params.id)) {
+			return
+		}
+
 		def shoppingList = ShoppingList.get(params.id)
 
-		if (shoppingList) {
-			shoppingList.delete()
+		shoppingList.delete()
 
-			render(contentType: "application/json", status: 204, text: '')
-		} else {
-			render(contentType: "application/json", status: 404) {
-				[errorMessage: "Not found"]
-			}
-		}
+		render(contentType: "application/json", status: 204, text: '')
 	}
 
 	def update() {
-		def shoppingList = ShoppingList.get(params.id)
-
-		if (!shoppingList) {
-			render(contentType: "application/json", status: 404) {
-				[errorMessage: "Not found"]
-			}
-
+		if (!checkListOwnership(params.id)) {
 			return
 		}
+
+		def shoppingList = ShoppingList.get(params.id)
 
 		shoppingList.description = request.JSON?.description
 

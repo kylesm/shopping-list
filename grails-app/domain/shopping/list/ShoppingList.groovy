@@ -22,6 +22,7 @@ class ShoppingList {
 	Date lastUpdated
 	boolean completed
 	SortedSet items
+	User owner
 
 	static hasMany = [items: ListItem]
 

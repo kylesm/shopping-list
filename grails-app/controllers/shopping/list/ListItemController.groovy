@@ -17,12 +17,32 @@
 package shopping.list
 
 class ListItemController {
+	def authorizationService
+
+	private def checkListOwnership(sid) {
+		def response = authorizationService.checkListOwnership(sid)
+
+		if (!response.authorized) {
+			render(contentType: "application/json", status: response.status) {
+				[errorMessage: response.errorMessage]
+			}
+
+			return false
+		}
+
+		return true
+	}
+
 	def update() {
+		if (!checkListOwnership(params.sid)) {
+			return
+		}
+
 		def item = ListItem.get(params.id)
 
 		if (!item) {
 			render(contentType: "application/json", status: 404) {
-				[errorMessage: "Not found"]
+				[errorMessage: "Item not found"]
 			}
 
 			return
@@ -44,13 +64,11 @@ class ListItemController {
 	}
 
 	def save() {
-		def shoppingList = ShoppingList.get(params.sid)
-
-		if (!shoppingList) {
-			render(contentType: "application/json", status: 404) {
-				[errorMessage: "Not found"]
-			}
+		if (!checkListOwnership(params.sid)) {
+			return
 		}
+
+		def shoppingList = ShoppingList.get(params.sid)
 
 		params.remove('sid')
 
@@ -84,6 +102,10 @@ class ListItemController {
 	}
 
 	def show() {
+		if (!checkListOwnership(params.sid)) {
+			return
+		}
+
 		def item = ListItem.get(params.id)
 
 		if (item) {
@@ -105,13 +127,11 @@ class ListItemController {
 	}
 
 	def bulkAdd() {
-		def shoppingList = ShoppingList.get(params.sid)
-
-		if (!shoppingList) {
-			render(contentType: "application/json", status: 404) {
-				[errorMessage: "Not found"]
-			}
+		if (!checkListOwnership(params.sid)) {
+			return
 		}
+
+		def shoppingList = ShoppingList.get(params.sid)
 
 		params.remove('sid')
 
@@ -149,7 +169,7 @@ class ListItemController {
 		def output = []
 
 		newItems.each { item ->
-			output << [	
+			output << [
 				id: item.id,
 				name: item.name,
 				quantity: item.quantity,
