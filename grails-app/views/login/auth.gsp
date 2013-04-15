@@ -2,7 +2,7 @@
 <head>
 	<title>Log in to shopping list</title>
 	<meta name="layout" content="main"/>
-	<r:require modules="core"/>
+	<r:require modules="core,auth"/>
 </head>
 <body>
 	<div data-role="page" id="login">
@@ -15,7 +15,7 @@
 			</div>
 		</g:if>
 		<div data-role="content" data-theme="a" class="ui-corner-bottom ui-content">
-			<form action="${postUrl}" method="POST" id="loginForm">
+			<form action="${postUrl}" method="POST" id="loginForm" data-ajax="false">
 				<label for="username">Username:</label>
 				<input type="text" data-clear-btn="true" name="j_username" id="username">
 				<label for="password">Password:</label>

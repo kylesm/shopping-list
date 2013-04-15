@@ -35,6 +35,10 @@ jQuery(document).ready(function($) {
 		}
 	});
 
+	$("div[data-role='popup']").on("popupafteropen", function () {
+		$($(".ui-popup-active form :input:visible")[0]).focus();
+	});
+
 	var handleListLinkClick = function (event) {
 		ShoppingList.currentListId = $(this).data('sid');
 

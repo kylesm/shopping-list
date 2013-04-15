@@ -14,4 +14,9 @@ modules = {
 		dependsOn 'core, templates'
 		resource url: '/js/shoppinglist.js'
 	}
+
+	auth {
+		dependsOn 'core'
+		resource url: '/js/auth.js'
+	}
 }
