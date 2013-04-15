@@ -7,21 +7,26 @@ import shopping.list.Role
 import shopping.list.UserRole
 
 class BootStrap {
+	def grailsApplication
 
     def init = { servletContext ->
+		def userRole = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
+		def adminRole = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
+
+		def adminUsername = grailsApplication.config.users.defaultAdminUsername
+		def adminPassword = grailsApplication.config.users.defaultAdminPassword
+
+		def user = User.findByUsername(adminUsername) ?: new User(username: adminUsername, password: adminPassword, enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
+
+		if (!user.authorities.contains(userRole)) {
+			UserRole.create(user, userRole)
+		}
+
 		switch (Environment.current) {
 		case Environment.DEVELOPMENT:
-			def userRole = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
-			def adminRole = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
-			def testUser = User.findByUsername('test') ?: new User(username: 'test', password: 'test', enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
-
-			if (!testUser.authorities.contains(userRole)) {
-				UserRole.create(testUser, userRole)
-			}
-
 			ShoppingList.withTransaction { status ->
 				def list = new ShoppingList([
-					description: 'My shopping list', completed: false, items: [], owner: testUser
+					description: 'My shopping list', completed: false, items: [], owner: user
 				])
 
 				list.items.addAll([
@@ -36,6 +41,7 @@ class BootStrap {
 			break
 		}
     }
+
     def destroy = {
     }
 }
