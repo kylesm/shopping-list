@@ -1,7 +1,6 @@
 package shopping.list
 
 class User {
-
 	transient springSecurityService
 
 	String username
@@ -17,6 +16,7 @@ class User {
 	}
 
 	static mapping = {
+		table 'sluser'
 		password column: '`password`'
 	}
 
